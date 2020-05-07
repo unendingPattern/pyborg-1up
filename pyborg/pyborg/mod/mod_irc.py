@@ -153,7 +153,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
         else:
             # check if we should reply anyways
             logger.debug(type(e.target))
-            if self.settings["speaking"] and self.chans[e.target.lower()]["speaking"]:
+            if self.settings["speaking"] and self.chans.get(e.target) and self.chans[e.target.lower()]["speaking"]:
                 reply_chance_inverse = 100 - self.chans[e.target.lower()]["reply_chance"]
                 logger.debug("Inverse Reply Chance = %d", reply_chance_inverse)
                 rnd = random.uniform(0, 100)  # nosec
