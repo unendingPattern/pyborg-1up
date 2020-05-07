@@ -20,6 +20,9 @@ quitmsg = "Bye :-("
 # Connect to pyborg instance over http for shared db?
 multiplex = true
 multiplex_server = "localhost"
+# List of words which will trigger the bot to reply.
+# Put "(?-i)" before a word to make it case insensitive. Supports regular expressions.
+trigger_words = ["(?i)PyBorg"]
 [server]
     server = "chat.freenode.net"
     port = 6697
