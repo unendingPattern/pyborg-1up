@@ -134,19 +134,24 @@ class ModIRC(irc.bot.SingleServerIRCBot):
                     logger.info("Running command %s", command)
                     c.privmsg(e.target, command())
 
-        a = e.arguments[0].split(":", 1)
-        # if talked to directly respond
-        # e.g. Pyborg: hello
-        if len(a) > 1 and irc.strings.lower(a[0]) == irc.strings.lower(self.connection.get_nickname()):
-            self.learn(self.strip_nicks(a[1], e).encode("utf-8"))
-            msg = self.reply(a[1].encode("utf-8"))
+        # trigger words
+        trigger_matched = False
+        if self.settings.get("trigger_words"):
+            trigger_words = self.settings["trigger_words"]
+            logger.debug("trigger_words: %s", trigger_words)
+            for trigger_word in trigger_words:
+                if re.search(trigger_word, e.arguments[0]):
+                    logger.debug("%s contained a match for %s", e.arguments[0], trigger_word)
+                    trigger_matched = True
+        if trigger_matched:
+            self.learn(self.strip_nicks(e.arguments[0], e).encode("utf-8"))
+            msg = self.reply(e.arguments[0].encode("utf-8"))
             if msg:
                 msg = self.replace_nicks(msg, e)
                 logger.info("Response: %s", msg)
                 c.privmsg(e.target, msg)
         else:
             # check if we should reply anyways
-
             logger.debug(type(e.target))
             if self.settings["speaking"] and self.chans[e.target.lower()]["speaking"]:
                 reply_chance_inverse = 100 - self.chans[e.target.lower()]["reply_chance"]
