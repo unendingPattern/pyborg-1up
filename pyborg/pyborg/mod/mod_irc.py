@@ -134,15 +134,31 @@ class ModIRC(irc.bot.SingleServerIRCBot):
                     logger.info("Running command %s", command)
                     c.privmsg(e.target, command())
 
-        # trigger words
         trigger_matched = False
-        if self.settings.get("trigger_words"):
-            trigger_words = self.settings["trigger_words"]
-            logger.debug("trigger_words: %s", trigger_words)
-            for trigger_word in trigger_words:
+        # global trigger words
+        if self.settings.get("trigger_words") and self.settings.get("trigger_chance"):
+            logger.debug("global trigger_words: %s", self.settings["trigger_words"])
+            for trigger_word, trigger_chance in zip(self.settings["trigger_words"], self.settings["trigger_chance"]):
                 if re.search(trigger_word, e.arguments[0]):
-                    logger.debug("%s contained a match for %s", e.arguments[0], trigger_word)
-                    trigger_matched = True
+                    logger.debug("{} contained a match for {} ({}% chance)".format(e.arguments[0], trigger_word, trigger_chance))
+                    reply_chance_inverse = 100 - trigger_chance
+                    logger.debug("global trigger: Inverse Reply Chance = %d", reply_chance_inverse)
+                    rnd = random.uniform(0, 100)
+                    logger.debug("global trigger: Random float: %d", rnd)
+                    if rnd > reply_chance_inverse:
+                        trigger_matched = True
+        # channel-specific trigger words
+        if self.chans.get(e.target) and self.chans[e.target.lower()].get("trigger_words") and self.chans[e.target.lower()].get("trigger_chance"):
+            logger.debug("chan trigger_words: %s", self.chans[e.target.lower()]["trigger_words"])
+            for trigger_word, trigger_chance in zip(self.chans[e.target.lower()]["trigger_words"], self.chans[e.target.lower()]["trigger_chance"]):
+                if re.search(trigger_word, e.arguments[0]):
+                    logger.debug("{} contained a match for {} ({}% chance)".format(e.arguments[0], trigger_word, trigger_chance))
+                    reply_chance_inverse = 100 - trigger_chance
+                    logger.debug("chan trigger: Inverse Reply Chance = %d", reply_chance_inverse)
+                    rnd = random.uniform(0, 100)
+                    logger.debug("chan trigger: Random float: %d", rnd)
+                    if rnd > reply_chance_inverse:
+                        trigger_matched = True
         if trigger_matched:
             self.learn(self.strip_nicks(e.arguments[0], e).encode("utf-8"))
             msg = self.reply(e.arguments[0].encode("utf-8"))
