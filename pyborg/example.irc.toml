@@ -20,9 +20,11 @@ quitmsg = "Bye :-("
 # Connect to pyborg instance over http for shared db?
 multiplex = true
 multiplex_server = "localhost"
-# List of words which will trigger the bot to reply.
-# Put "(?-i)" before a word to make it case insensitive. Supports regular expressions.
-trigger_words = ["(?i)PyBorg"]
+# List of global trigger words. Supports regular expressions.
+# Put "(?-i)" before a word to make it case insensitive.
+trigger_words = ["(?i)Pyborg", "(?i)example"]
+# % chance for trigger words, add one for each word.
+trigger_chance = [100, 0]
 [server]
     server = "chat.freenode.net"
     port = 6697
@@ -39,10 +41,21 @@ trigger_words = ["(?i)PyBorg"]
         speaking = true
         # Chance of reply (%) per message
         reply_chance = 5
+        # List of channel-specific trigger words. Supports regular expressions.
+        # Put "(?-i)" before a word to make it case insensitive.
+        trigger_words = ["example", "(?i)words"]
+        # % chance for trigger words, add one for each word.
+        trigger_chance = [0, 0]
     [[server.channels]]
         chan = "#queertoo"
         speaking = false
         # Chance of reply (%) per message
         reply_chance = 5
+        # List of channel-specific trigger words. Supports regular expressions.
+        # Put "(?-i)" before a word to make it case insensitive.
+        trigger_words = ["example", "(?i)words"]
+        # % chance for trigger words, add one for each word.
+        trigger_chance = [0, 0]
+
 
 
